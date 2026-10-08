@@ -1,6 +1,7 @@
 from cryptography.fernet import Fernet, InvalidToken
 import argparse
 from pathlib import Path
+import os
 
 DEFAULT_KEY_FILE = Path("secret.key")
 
@@ -13,6 +14,9 @@ def get_or_create_key(key_file: Path) -> bytes:
     key_file.parent.mkdir(parents=True, exist_ok=True)
     key = Fernet.generate_key()
     key_file.write_bytes(key)
+    # On POSIX systems, keep the generated key readable only by the owner.
+    if os.name == "posix":
+        key_file.chmod(0o600)
     return key
 
 
